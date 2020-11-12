@@ -1,9 +1,16 @@
 import axios from "axios";
 
+let githubClientToken;
+if (process.env.NODE_ENV !== 'production') {
+  githubClientToken = process.env.REACT_APP_GITHUB_TOKEN;
+} else {
+  githubClientToken = process.env.GITHUB_TOKEN;
+}
+
 const github = axios.create({
   baseURL: 'https://api.github.com',
   timeout: 3000,
-  headers: { Authorization: process.env.REACT_APP_GITHUB_TOKEN }
+  headers: { Authorization: githubClientToken }
 })
 
 export const searchUsers = async (text) => {
