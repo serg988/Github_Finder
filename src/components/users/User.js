@@ -3,30 +3,39 @@ import Spinner from "../layout/Spinner";
 import { Link, withRouter } from "react-router-dom";
 import Repos from "../repos/Repos";
 import GithubContext from "../../context/github/githubContext";
+import { getUserAndRepos } from "../../context/actions";
+import { GET_USER_AND_REPOS, SET_LOADING } from "../../context/types";
 
-const User = ({ match }) => {
-  const githubContext = useContext(GithubContext);
-  const { loading, getUser, user, getUserRepos } = githubContext;
+const User = ({ match :{params} }) => {
+     const {
+       user: {
+         name,
+         avatar_url,
+         location,
+         bio,
+         login,
+         html_url,
+         followers,
+         following,
+         public_gists,
+         public_repos,
+         hireable,
+         blog,
+         company,
+       },
+       loading,
+       dispatch,
+       repos,
+  } = useContext(GithubContext);
+  
   useEffect(() => {
-    getUser(match.params.login);
-    getUserRepos(match.params.login);
-    //eslint-disable-next-line
-  }, []);
-  const {
-    name,
-    company,
-    avatar_url,
-    location,
-    bio,
-    blog,
-    login,
-    html_url,
-    followers,
-    following,
-    public_repos,
-    public_gists,
-    hireable,
-  } = user;
+    dispatch({ type: SET_LOADING })
+    getUserAndRepos(params.login).then(res =>
+      dispatch({ type: GET_USER_AND_REPOS, payload: res })
+    )
+    }, [dispatch, params.login]);
+ 
+  
   console.log(blog);
 
   if (loading) return <Spinner />;

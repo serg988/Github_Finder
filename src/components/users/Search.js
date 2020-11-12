@@ -1,12 +1,19 @@
 import React, { useState, useContext } from "react";
 import GithubContext from "../../context/github/githubContext";
+import { searchUsers } from "../../context/actions";
 import AlertContext from "../../context/alert/alertContext";
+import {
+  SEARCH_USERS,
+  SET_TEXT,
+  SET_LOADING,
+  CLEAR_USERS,
+} from "../../context/types";
 
 const Search = () => {
   const githubContext = useContext(GithubContext);
   const alertContext = useContext(AlertContext);
   const [input, setInput] = useState("");
-  const { text, setText }  = githubContext;
+  const { dispatch, users } = githubContext;
 
   const onChangeHandler = (e) => setInput(e.target.value);
   const onSubmitHandler = (e) => {
@@ -14,8 +21,11 @@ const Search = () => {
     if (input === "") {
       alertContext.setAlert("Please enter something", "primary");
     } else {
-      setText(input)
-      githubContext.searchUsers(input);
+      dispatch({ type: SET_LOADING });
+      dispatch({ type: SET_TEXT, payload: input });
+      searchUsers(input).then((users) => {
+        dispatch({ type: SEARCH_USERS, payload: users });
+      });
       setInput("");
     }
   };
@@ -39,7 +49,7 @@ const Search = () => {
       {githubContext.users.length > 0 && (
         <button
           className='btn btn-light btn-block'
-          onClick={githubContext.clearUsers}
+          onClick={() => dispatch({ type: CLEAR_USERS })}
         >
           Clear Search
         </button>
